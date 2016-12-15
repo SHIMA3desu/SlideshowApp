@@ -7,12 +7,18 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import java.sql.Time;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,11 +26,15 @@ public class MainActivity extends AppCompatActivity {
     //private int counter = 1;
     private int counter = 0;
     private int cnt = 0;//MAX COUNTER
+    private  Timer mtimer = null;
+    private  TimerTask mtimerTask =null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // パーミッションの許可状態を確認
@@ -40,15 +50,67 @@ public class MainActivity extends AppCompatActivity {
         } else {
          //   getContentsInfo();
             getNextContentsInfo(1);
+        }
+        final  Handler mhandler = new Handler();
+        //       Timer mtimer = new Timer();
+        mtimer = new Timer();
+        //       TimerTask mtimerTask = new TimerTask() {
+        mtimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                mhandler.post(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                int bt01counter = counter;
+                                bt01counter++;
+                                getNextContentsInfo(bt01counter);
+                            }
+                        }
+
+                );
+
+            }
+        };
+    }
+    public void BT03(View v){
+        Button bt03 = (Button)findViewById(R.id.button3);
+        Button bt02 = (Button)findViewById(R.id.button2);
+        Button bt01 = (Button)findViewById(R.id.button1);
+        String bt03name = (String)bt03.getText().toString();
+        final Handler mhandler = new Handler();
+
+        if (bt03name.equals("再生")){
+            if (mtimer == null){
+                mtimer = new Timer();
+            }
+
+            bt03.setText("停止");
+            bt02.setEnabled(false);
+            bt01.setEnabled(false);
+            mtimer.schedule(mtimerTask,0,2000);
+
+            Log.d("TESTJAVA","再生pass");
+
+
+        } else {
+            bt03.setText("再生");
+            bt02.setEnabled(true);
+            bt01.setEnabled(true);
+            mtimer.cancel();
+            mtimer.purge();
+            mtimer = null;
+            Log.d("TESTJAVA","停止pass");
+
+
 
         }
     }
+
     public void BT01(View v){
         int bt01counter = counter;
         bt01counter++;
         getNextContentsInfo(bt01counter);
-
-
     }
 
     public void BT02(View v){
@@ -61,11 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
             bt02counter--;
         }
-
-
         getBackContentsInfo(bt02counter);
-
-
     }
 
     @Override
