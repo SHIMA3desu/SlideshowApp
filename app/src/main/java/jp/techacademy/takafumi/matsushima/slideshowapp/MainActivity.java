@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         }
         final  Handler mhandler = new Handler();
         //       Timer mtimer = new Timer();
-        mtimer = new Timer();
+        mtimer = new Timer(true);
         //       TimerTask mtimerTask = new TimerTask() {
         mtimerTask = new TimerTask() {
             @Override
@@ -82,7 +82,24 @@ public class MainActivity extends AppCompatActivity {
 
         if (bt03name.equals("再生")){
             if (mtimer == null){
-                mtimer = new Timer();
+                mtimer = new Timer(true);
+                mtimerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        mhandler.post(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        int bt01counter = counter;
+                                        bt01counter++;
+                                        getNextContentsInfo(bt01counter);
+                                    }
+                                }
+
+                        );
+
+                    }
+                };
             }
 
             bt03.setText("停止");
